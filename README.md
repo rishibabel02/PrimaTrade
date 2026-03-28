@@ -98,15 +98,26 @@ This app uses **Vite**, not Create React App. If the build fails with `react-scr
 
 **Environment variables on Vercel**
 
-The browser must call your **deployed API**, not `localhost`. In Vercel → **Settings → Environment Variables**, set:
+The browser must call your **deployed API**, not `localhost`. If you skip this step you get **Network Error** on login: the built app still points at `http://localhost:4000`, which is wrong (and **HTTPS** pages cannot call **HTTP** `localhost` anyway).
+
+1. Deploy the **backend** somewhere with **HTTPS** (Railway, Render, Fly.io, etc.).
+2. In Vercel → **Settings → Environment Variables** (for **Production**):
 
 ```text
-VITE_API_BASE_URL=https://your-api-host.example.com/api/v1
+VITE_API_BASE_URL=https://YOUR-API-HOST/api/v1
 ```
 
-Redeploy after changing env vars (Vite bakes `VITE_*` in at build time). Your API must allow this origin in **CORS** (add your `https://*.vercel.app` URL in the backend `cors` config for production).
+Use the exact public base URL of your API (no trailing slash before `api` — path should be `/api/v1`).
 
-The backend is not deployed by this Vercel project; host it separately (Railway, Render, Fly.io, etc.) and point `VITE_API_BASE_URL` at it.
+3. On the **backend** host, set **`NODE_ENV=production`** and **`CORS_ORIGINS`** to your frontend origin(s), comma-separated, **no wildcards**:
+
+```text
+CORS_ORIGINS=https://your-app.vercel.app
+```
+
+4. **Redeploy** the Vercel project after saving env vars (Vite inlines `VITE_*` at **build** time).
+
+The backend README lists all env vars; refresh cookies use **`SameSite=None; Secure`** in production so token refresh works when the UI and API are on different domains.
 
 ## API documentation
 

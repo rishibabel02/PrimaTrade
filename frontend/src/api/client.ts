@@ -2,6 +2,13 @@ import axios, { InternalAxiosRequestConfig } from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000/api/v1';
 
+if (import.meta.env.PROD && API_BASE_URL.includes('localhost')) {
+    // eslint-disable-next-line no-console
+    console.error(
+        '[PrimaTrade] VITE_API_BASE_URL is missing — Vercel build must define it to your public HTTPS API URL.'
+    );
+}
+
 export const api = axios.create({
     baseURL: API_BASE_URL,
     withCredentials: true, // send cookies (refresh token)
@@ -32,6 +39,17 @@ function processQueue(error: unknown, token: string | null) {
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
+        if (!error.response && import.meta.env.PROD) {
+            if (API_BASE_URL.includes('localhost')) {
+                error.message =
+                    'API URL not set: add VITE_API_BASE_URL on Vercel (your HTTPS API, ending in /api/v1).';
+            } else {
+                error.message =
+                    'Cannot reach API: ensure the backend is up, uses HTTPS, and CORS allows your Vercel URL.';
+            }
+            return Promise.reject(error);
+        }
+
         const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
         if (error.response?.status === 401 && !originalRequest._retry) {

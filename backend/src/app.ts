@@ -20,10 +20,25 @@ const app = express();
 
 // ─── Security & Parsing ──────────────────────────────────────────────────────
 app.use(helmet());
+const devOrigins = ['http://localhost:5173', 'http://localhost:3000'];
 app.use(
     cors({
-        origin: config.isDev ? ['http://localhost:5173', 'http://localhost:3000'] : [],
         credentials: true,
+        origin(origin, callback) {
+            if (!origin) {
+                callback(null, true);
+                return;
+            }
+            if (config.isDev) {
+                callback(null, devOrigins.includes(origin));
+                return;
+            }
+            if (config.corsOrigins.length === 0) {
+                callback(null, false);
+                return;
+            }
+            callback(null, config.corsOrigins.includes(origin));
+        },
     })
 );
 app.use(express.json({ limit: '10kb' }));

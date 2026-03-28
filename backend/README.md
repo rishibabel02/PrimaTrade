@@ -27,6 +27,8 @@ REST API for the PrimaTrade backend assignment: JWT authentication, role-based a
    | `JWT_REFRESH_SECRET` | Strong secret for refresh tokens |
    | `COOKIE_SECRET` | Secret for signed cookies |
    | `PORT` | Server port (default `4000`) |
+   | `CORS_ORIGINS` | **Production:** comma-separated browser origins (e.g. `https://app.vercel.app`) |
+   | `NODE_ENV` | Set to `production` when deployed (enables HTTPS-only CORS + cross-site cookies) |
 
 3. **Database**
 

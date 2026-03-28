@@ -10,6 +10,11 @@ async function main() {
         logger.info(`🚀 PrimaTrade API running on http://localhost:${config.port}`);
         logger.info(`📚 Swagger docs available at http://localhost:${config.port}/api/docs`);
         logger.info(`🌍 Environment: ${config.nodeEnv}`);
+        if (!config.isDev && config.corsOrigins.length === 0) {
+            logger.warn(
+                'CORS_ORIGINS is empty — set it to your frontend URL(s) (e.g. https://app.vercel.app) or browser requests will fail.'
+            );
+        }
     });
 
     // Graceful shutdown

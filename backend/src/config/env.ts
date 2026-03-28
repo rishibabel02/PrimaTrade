@@ -9,10 +9,19 @@ function requireEnv(key: string): string {
     return value;
 }
 
+const isProd = process.env['NODE_ENV'] === 'production';
+
+/** Comma-separated list, e.g. https://my-app.vercel.app */
+const corsOrigins = (process.env['CORS_ORIGINS'] ?? '')
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean);
+
 export const config = {
     port: parseInt(process.env['PORT'] ?? '4000', 10),
     nodeEnv: process.env['NODE_ENV'] ?? 'development',
-    isDev: process.env['NODE_ENV'] !== 'production',
+    isDev: !isProd,
+    corsOrigins,
     db: {
         url: requireEnv('DATABASE_URL'),
     },
@@ -24,5 +33,13 @@ export const config = {
     },
     cookie: {
         secret: process.env['COOKIE_SECRET'] ?? 'cookie_secret',
+    },
+    /** Cross-site SPA (e.g. Vercel → API host) needs SameSite=None; Secure in production */
+    refreshTokenCookie: {
+        httpOnly: true as const,
+        secure: isProd,
+        sameSite: (isProd ? 'none' : 'strict') as 'lax' | 'strict' | 'none',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: '/' as const,
     },
 } as const;
