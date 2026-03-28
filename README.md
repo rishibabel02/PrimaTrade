@@ -79,6 +79,35 @@ cd backend && npm run build && npm start
 cd frontend && npm run build && npm run preview
 ```
 
+## Deploy frontend on Vercel
+
+This app uses **Vite**, not Create React App. If the build fails with `react-scripts: command not found`, Vercel is using the wrong preset or an old **Build Command** override.
+
+**Option A — project root = repository root (recommended with this repo)**
+
+1. In Vercel: **Settings → General → Root Directory** = `.` (empty / repository root).
+2. **Settings → General → Build & Development Settings**: clear **Build Command** and **Output Directory** overrides (let [vercel.json](./vercel.json) at the repo root define them).
+3. Redeploy.
+
+**Option B — Root Directory = `frontend`**
+
+1. Set **Root Directory** to `frontend`.
+2. **Framework Preset**: **Vite**.
+3. Build Command: `npm run build`, Output: `dist`.
+4. Remove any custom command that mentions `react-scripts`.
+
+**Environment variables on Vercel**
+
+The browser must call your **deployed API**, not `localhost`. In Vercel → **Settings → Environment Variables**, set:
+
+```text
+VITE_API_BASE_URL=https://your-api-host.example.com/api/v1
+```
+
+Redeploy after changing env vars (Vite bakes `VITE_*` in at build time). Your API must allow this origin in **CORS** (add your `https://*.vercel.app` URL in the backend `cors` config for production).
+
+The backend is not deployed by this Vercel project; host it separately (Railway, Render, Fly.io, etc.) and point `VITE_API_BASE_URL` at it.
+
 ## API documentation
 
 - **Swagger UI** (when the backend is running): `/api/docs`
