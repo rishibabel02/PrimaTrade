@@ -117,6 +117,24 @@ input, textarea, select { font-family: inherit; }
 .auth-title { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
 .auth-subtitle { color: var(--text-secondary); font-size: 14px; margin-bottom: 28px; }
 
+.deploy-notice {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--warning);
+  background: var(--warning-dim);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-bottom: 20px;
+}
+.deploy-notice code {
+  font-size: 12px;
+  background: var(--bg-secondary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--text-primary);
+}
+
 /* ── Form Elements ───────────────────────────────────────────────────────────── */
 .form-group { margin-bottom: 16px; }
 

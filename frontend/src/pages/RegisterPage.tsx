@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../store/AuthContext';
 import { getErrorMessage } from '../utils/errorMessage';
+import { DeployConfigNotice } from '../components/DeployConfigNotice';
 
 const PASSWORD_HINT =
     'At least 8 characters, one uppercase letter, and one number.';
@@ -44,6 +45,8 @@ export function RegisterPage() {
                 </div>
                 <h1 className="auth-title">Create account</h1>
                 <p className="auth-subtitle">Register to manage tasks with a secure JWT session.</p>
+
+                <DeployConfigNotice />
 
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">

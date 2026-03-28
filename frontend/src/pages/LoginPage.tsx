@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../store/AuthContext';
 import { getErrorMessage } from '../utils/errorMessage';
+import { DeployConfigNotice } from '../components/DeployConfigNotice';
 
 export function LoginPage() {
     const { login } = useAuth();
@@ -37,6 +38,8 @@ export function LoginPage() {
                 </div>
                 <h1 className="auth-title">Sign in</h1>
                 <p className="auth-subtitle">Use your account to access the task dashboard.</p>
+
+                <DeployConfigNotice />
 
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
