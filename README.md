@@ -1,129 +1,101 @@
 # PrimaTrade
 
-Full-stack demo for the PrimaTrade backend assignment: **JWT auth**, **user vs admin** roles, **task CRUD**, and a **React** UI. API is versioned under `/api/v1` with **Swagger** at `/api/docs`.
+A full-stack scalable REST API and React frontend application built for the PrimaTrade Backend Developer assignment. It features **JWT authentication with rotation**, **role-based access control (RBAC)**, **task management** with filtering/pagination, and a premium dark-themed React UI.
 
-## Repository layout
+## Live Demo
+
+- **Frontend (Vercel):** [https://primatrade-rishi-bs-projects.vercel.app](https://primatrade-rishi-bs-projects.vercel.app)
+- **API Base URL (Render):** `https://primatrade.onrender.com/api/v1`
+- **Swagger Documentation:** [https://primatrade.onrender.com/api/docs](https://primatrade.onrender.com/api/docs)
+- **API Health Check:** [https://primatrade.onrender.com/api/health](https://primatrade.onrender.com/api/health)
+
+### Test Credentials
+| Role | Email | Password |
+|---|---|---|
+| **User** | `user@primetrade.ai` | `User@1234` |
+| **Admin** | `admin@primetrade.ai` | `Admin@1234` |
+
+*(Note: The Render backend is on a free tier and spins down after 15 minutes of inactivity. The first request may take ~30-50 seconds to wake up the server. A 5-second timeout on the frontend protects against hanging UI).*
+
+---
+
+## 🛠 Tech Stack
+
+### Backend
+- **Core:** Node.js, Express 5, TypeScript
+- **Database:** PostgreSQL, Prisma ORM
+- **Security:** bcryptjs (password hashing), jsonwebtoken (auth), Helmet, CORS, Express Rate Limit
+- **Validation:** Zod
+- **Documentation:** Swagger UI, Postman
+
+### Frontend
+- **Core:** React 18, Vite, TypeScript
+- **Routing:** React Router v6
+- **Data Fetching:** Axios (with custom JWT interceptors and silent refresh queue)
+- **Styling:** Custom Vanilla CSS (Premium Dark Theme, CSS Variables, Animations)
+
+---
+
+## 📂 Repository Layout
 
 | Folder | Description |
 |--------|-------------|
-| `backend/` | Express 5 + Prisma + PostgreSQL API ([detailed docs](./backend/README.md)) |
-| `frontend/` | Vite + React + TypeScript client |
+| `backend/` | Express 5 + Prisma API. Contains all business logic, routes, controllers, and services. |
+| `frontend/` | React + Vite client. Contains components, pages, state management, and API clients. |
 
-## Prerequisites
+---
 
-- **Node.js** 18+
-- **PostgreSQL** 14+ (local or Docker)
-- npm (or pnpm/yarn)
+## 💻 Local Development Setup
 
-## Quick start
+### 1. Prerequisites
+- **Node.js** v18+
+- **PostgreSQL** 14+ (Local or via Docker)
 
-### 1. Database
-
-Create a database (example name `primatrade`) and note the connection string.
-
-Example with Docker:
-
+Example running PostgreSQL with Docker:
 ```bash
 docker run --name primatrade-pg -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=primatrade -p 5432:5432 -d postgres:16
 ```
 
-Then use:
-
-`postgresql://postgres:postgres@localhost:5432/primatrade`
-
-### 2. Backend
-
+### 2. Backend Setup
+In a terminal, navigate to the backend folder:
 ```bash
 cd backend
 cp .env.example .env
-# Edit .env: set DATABASE_URL, JWT_ACCESS_SECRET, JWT_REFRESH_SECRET, COOKIE_SECRET
-
-npm install
-npx prisma generate
-npx prisma db push
-npm run db:seed
-npm run dev
 ```
 
-API: **http://localhost:4000**  
-Swagger: **http://localhost:4000/api/docs**  
-Health: **http://localhost:4000/api/health**
+Edit your `.env` file to include your database credentials and randomly generated JWT secrets.
 
-After seeding:
+Install dependencies, provision the DB, and run the server:
+```bash
+npm install
+npx prisma db push     # Sync schema
+npx prisma generate    # Generate client
+npm run db:seed        # Seed demo user & admin accounts
+npm run dev            # Start development server
+```
+The API will run on `http://localhost:4000`.
 
-- User: `user@primetrade.ai` / `User@1234`
-- Admin: `admin@primetrade.ai` / `Admin@1234`
-
-### 3. Frontend
-
-In a **second** terminal:
-
+### 3. Frontend Setup
+In a **second** terminal, navigate to the frontend folder:
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
+The application will run on `http://localhost:5173`. By default, it communicates with `http://localhost:4000/api/v1`.
 
-App: **http://localhost:5173**
+---
 
-The UI calls `http://localhost:4000/api/v1` by default. To override, add `frontend/.env`:
+## 📈 Scalability Considerations
 
-```env
-VITE_API_BASE_URL=http://localhost:4000/api/v1
-```
+The architecture is designed to scale horizontally:
+1. **Stateless Authentication:** JWTs are used instead of session stores, meaning backend instances don't need sticky sessions.
+2. **Database:** PostgreSQL is configured with proper connection pooling (handled by Prisma).
+3. **Optimizations:** Advanced queries run efficiently (e.g., using Prisma `groupBy` to fetch all stats in a single database roundtrip, taking the load off multiple API calls).
+4. *(Future)* For extremely high load, Redis can be introduced for refresh-token blacklisting/caching, and PostgreSQL read-replicas could be used for heavy GET requests.
 
-## Production builds
+## 📄 API Documentation
 
-```bash
-cd backend && npm run build && npm start
-cd frontend && npm run build && npm run preview
-```
+- **Swagger UI** (when the backend is running locally): `http://localhost:4000/api/docs`
+- **Postman**: Import the collection located at `backend/postman/PrimaTrade.postman_collection.json`.
 
-## Deploy frontend on Vercel
-
-This app uses **Vite**, not Create React App. If the build fails with `react-scripts: command not found`, Vercel is using the wrong preset or an old **Build Command** override.
-
-**Option A — project root = repository root (recommended with this repo)**
-
-1. In Vercel: **Settings → General → Root Directory** = `.` (empty / repository root).
-2. **Settings → General → Build & Development Settings**: clear **Build Command** and **Output Directory** overrides (let [vercel.json](./vercel.json) at the repo root define them).
-3. Redeploy.
-
-**Option B — Root Directory = `frontend`**
-
-1. Set **Root Directory** to `frontend`.
-2. **Framework Preset**: **Vite**.
-3. Build Command: `npm run build`, Output: `dist`.
-4. Remove any custom command that mentions `react-scripts`.
-
-**Environment variables on Vercel**
-
-The browser must call your **deployed API**, not `localhost`. If you skip this step you get **Network Error** on login: the built app still points at `http://localhost:4000`, which is wrong (and **HTTPS** pages cannot call **HTTP** `localhost` anyway).
-
-1. Deploy the **backend** somewhere with **HTTPS** (Railway, Render, Fly.io, etc.).
-2. In Vercel → **Settings → Environment Variables** (for **Production**):
-
-```text
-VITE_API_BASE_URL=https://YOUR-API-HOST/api/v1
-```
-
-Use the exact public base URL of your API (no trailing slash before `api` — path should be `/api/v1`).
-
-3. On the **backend** host, set **`NODE_ENV=production`** and **`CORS_ORIGINS`** to your frontend origin(s), comma-separated, **no wildcards**:
-
-```text
-CORS_ORIGINS=https://your-app.vercel.app
-```
-
-4. **Redeploy** the Vercel project after saving env vars (Vite inlines `VITE_*` at **build** time).
-
-The backend README lists all env vars; refresh cookies use **`SameSite=None; Secure`** in production so token refresh works when the UI and API are on different domains.
-
-## API documentation
-
-- **Swagger UI** (when the backend is running): `/api/docs`
-- **Postman**: import [backend/postman/PrimaTrade.postman_collection.json](./backend/postman/PrimaTrade.postman_collection.json)
-
-## Scalability
-
-See the **Scalability note** section in [backend/README.md](./backend/README.md).
