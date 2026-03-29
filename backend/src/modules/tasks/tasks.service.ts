@@ -105,3 +105,21 @@ export async function deleteTask(taskId: string, userId: string, userRole: Role)
 
     await prisma.task.delete({ where: { id: taskId } });
 }
+
+export async function getStats(userId: string, userRole: Role) {
+    const ownerFilter = userRole === Role.ADMIN ? {} : { userId };
+
+    const rows = await prisma.task.groupBy({
+        by: ['status'],
+        where: ownerFilter,
+        _count: { _all: true },
+    });
+
+    const counts: Record<string, number> = { TODO: 0, IN_PROGRESS: 0, DONE: 0, total: 0 };
+    for (const row of rows) {
+        counts[row.status] = row._count._all;
+        counts['total'] += row._count._all;
+    }
+    return counts;
+}
+

@@ -38,6 +38,19 @@ router.get('/', tasksController.listTasks);
 
 /**
  * @openapi
+ * /tasks/stats:
+ *   get:
+ *     summary: Get task counts grouped by status
+ *     tags: [Tasks]
+ *     responses:
+ *       200:
+ *         description: Task counts by status
+ */
+router.get('/stats', tasksController.getStats);
+
+
+/**
+ * @openapi
  * /tasks:
  *   post:
  *     summary: Create a new task

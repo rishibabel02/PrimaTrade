@@ -12,6 +12,12 @@ export const listTasks = asyncHandler(async (req: Request, res: Response) => {
     sendSuccess(res, result.tasks, 'Tasks fetched', 200, result.meta);
 });
 
+export const getStats = asyncHandler(async (req: Request, res: Response) => {
+    const stats = await tasksService.getStats(req.user!.sub, req.user!.role);
+    sendSuccess(res, stats, 'Stats fetched');
+});
+
+
 export const getTask = asyncHandler(async (req: Request, res: Response) => {
     const taskId = routeParam(req, 'id');
     if (!taskId) throw BadRequest('Task id is required');
