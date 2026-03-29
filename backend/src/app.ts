@@ -20,7 +20,8 @@ const app = express();
 
 // ─── Security & Parsing ──────────────────────────────────────────────────────
 app.use(helmet());
-const devOrigins = ['http://localhost:5173', 'http://localhost:3000'];
+const devOrigins = ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3000'];
+
 app.use(
     cors({
         credentials: true,
