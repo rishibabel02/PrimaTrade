@@ -17,18 +17,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    // On mount: try to restore session from stored token
     useEffect(() => {
         const token = localStorage.getItem('accessToken');
         if (!token) {
             setIsLoading(false);
             return;
         }
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 5000); // 5s timeout
+
         authApi
             .me()
             .then((res) => setUser(res.data.data))
             .catch(() => localStorage.removeItem('accessToken'))
-            .finally(() => setIsLoading(false));
+            .finally(() => { clearTimeout(timer); setIsLoading(false); });
+
+        return () => { clearTimeout(timer); controller.abort(); };
     }, []);
 
     const login = useCallback(async (email: string, password: string) => {

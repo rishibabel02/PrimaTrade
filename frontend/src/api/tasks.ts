@@ -59,4 +59,8 @@ export const tasksApi = {
         api.put<{ success: boolean; data: Task }>(`/tasks/${id}`, data),
 
     delete: (id: string) => api.delete(`/tasks/${id}`),
+
+    stats: () =>
+        api.get<{ success: boolean; data: { TODO: number; IN_PROGRESS: number; DONE: number; total: number } }>('/tasks/stats'),
 };
+

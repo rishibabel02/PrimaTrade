@@ -344,8 +344,8 @@ export function DashboardPage() {
                                                 task.status === 'DONE'
                                                     ? 'var(--success)'
                                                     : task.status === 'IN_PROGRESS'
-                                                      ? 'var(--warning)'
-                                                      : 'var(--text-muted)',
+                                                        ? 'var(--warning)'
+                                                        : 'var(--text-muted)',
                                         }}
                                     />
                                     <div className="task-info">
